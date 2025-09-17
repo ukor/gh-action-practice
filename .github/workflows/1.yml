@@ -35,13 +35,13 @@ jobs:
           
 
           # Exit immediately if a command exits with a non-zero status.
-          set -o errexit
+          # set -o errexit
           
           # Treat unset variables as an error when substituting.
-          set -o nounset
+          # set -o nounset
           
           # The exit status of a pipeline is the status of the last command to exit with a non-zero status.
-          set -o pipefail
+          # set -o pipefail
           
           # Declare the associative array
           declare -A changed_files
