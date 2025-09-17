@@ -51,6 +51,8 @@ jobs:
           end_commit="$AFTER_PR_SHA"
 
           echo "$start_commit" "$end_commit"
+
+          git --version
           
           # Capture the output of git diff in a variable
           file_list=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
