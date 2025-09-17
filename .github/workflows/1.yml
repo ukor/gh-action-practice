@@ -26,7 +26,45 @@ jobs:
       - name: Run a multi-line script
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+          BEFORE_PR_SHA: ${{ github.event.before }}
+          AFTER_PR_SHA: ${{ github.event.after }}
         run: |
           echo Add other actions to build,
           echo "$GITHUB_CONTEXT"
           echo "$GITHUB_WORKSPACE"
+          
+
+          # Exit immediately if a command exits with a non-zero status.
+          set -o errexit
+          
+          # Treat unset variables as an error when substituting.
+          set -o nounset
+          
+          # The exit status of a pipeline is the status of the last command to exit with a non-zero status.
+          set -o pipefail
+          
+          # Declare the associative array
+          declare -A changed_files
+          
+          # Replace these with your actual commit SHAs
+          start_commit="$BEFORE_PR_SHA"
+          end_commit="$AFTER_PR_SHA"
+          
+          # Capture the output of git diff in a variable
+          file_list=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
+          
+          # Read each line from the variable and populate the array
+          # -r prevents backslash escapes from being interpreted
+          # -a creates an array from the input
+          while read -r file_path; do
+              if [[ -n "$file_path" ]]; then
+                  # The key and value are both the file path
+                  changed_files["$file_path"]="$file_path"
+              fi
+          done <<< "$file_list"
+          
+          # Optional: Print the contents of the array to verify
+          echo "Files changed between $start_commit and $end_commit:"
+          for file in "${!changed_files[@]}"; do
+              echo "- $file"
+          done
