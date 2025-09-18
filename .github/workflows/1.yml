@@ -54,6 +54,8 @@ jobs:
 
           echo "$start_commit" "$end_commit"
 
+          git --no-pager diff --name-only FETCH_HEAD $(git merge-base FETCH_HEAD master)
+
           git --version
           
           # Capture the output of git diff in a variable
