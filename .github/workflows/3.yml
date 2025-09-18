@@ -89,7 +89,7 @@ jobs:
           id: changedFiles
           env:
             JSON_FILE_LIST: ${{needs.job1.outputs.changed_files}}
-            FILES: ${{ fromJson(needs.job1.outputs.changed_files) }}
+            FILES: ${{ fromJSON(needs.job1.outputs.changed_files) }}
           run: |
             
             echo "----------"
@@ -98,6 +98,8 @@ jobs:
             git --version
 
             echo "$JSON_FILE_LIST"
+
+            readarray -t file_list_array < <(echo '$JSON_FILE_LIST' | jq -r '.[]')
             
             # An array to store the unique two-component paths
             declare -a component_list
@@ -105,7 +107,7 @@ jobs:
             # Use a temporary associative array to handle uniqueness easily
             declare -A unique_components
             
-            for file_path in "${FILES[@]}"; do
+            for file_path in "${file_list_array[@]}"; do
                 # Check if the path starts with "apps/" or "packages/"
                 if [[ "$file_path" =~ ^(apps|packages)/ ]]; then
                     # Use IFS to split the path into an array of components
