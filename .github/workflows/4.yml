@@ -1,0 +1,159 @@
+
+name: experiment 3.yml
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    outputs:
+      starts_commit_sha: ${{ steps.getCommitSHAs.outputs.start_commit }}
+      end_commit_sha: ${{ steps.getCommitSHAs.outputs.end_commit }}
+      changed_files: ${{ steps.getCommitSHAs.outputs.changed_files }}
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0
+      - name: Github context
+        id: getGithubContext
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo Add other actions to build,
+          echo "$GITHUB_CONTEXT"
+          echo "$GITHUB_WORKSPACE"
+
+      - id: getCommitSHAs
+        name: Get Commit SHA 
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          BEFORE_PR_SHA: ${{ github.event.before }}
+          AFTER_PR_SHA: ${{ github.event.after }}
+        run: |
+          echo "get start and end SHA",
+          
+          echo "----------"
+
+          
+          set -o errexit
+          
+          # set -o nounset
+          
+          set -o pipefail
+
+          git --version
+          
+          # Replace these with your actual commit SHAs
+          start_commit=$(git rev-parse --short "$BEFORE_PR_SHA")
+          end_commit=$(git rev-parse --short "$AFTER_PR_SHA")
+
+          echo "start_commit=$start_commit" >> "$GITHUB_OUTPUT"
+          echo "end_commit=$end_commit" >> "$GITHUB_OUTPUT"
+
+          echo "start_commit=$start_commit" >> "$GITHUB_ENV"
+          echo "end_commit=$end_commit" >> "$GITHUB_ENV"
+
+          echo "start SHA = $start_commit" " end SHA = $end_commit"
+          
+      - id: getFiles
+        name: Get Files between commit SHA 
+        run: |
+          echo "get files between commits",
+          
+          echo "----------"
+          
+          set -o errexit
+
+          set -o pipefail
+
+          git --version
+          
+          echo "start SHA = $start_commit" " end SHA = $end_commit"
+
+          readarray -t file_list < <(git --no-pager diff --name-only "$start_commit" "$end_commit")
+          json_array=$(printf '%s\n' "${file_list[@]}" | jq -R . | jq -s .)
+          
+          IFS=,
+          list_string="${file_list[*]}"
+
+          echo "--- file list start --"
+          
+          echo "$json_array"
+
+          echo "$list_string"
+
+          echo "--- file list end --"
+
+          echo "changed_files=$list_string" >> "$GITHUB_OUTPUT"
+  job2:
+    runs-on: ubuntu-latest
+    needs: [job1]
+    steps:
+        - name: log output
+          env:
+            START_COMMIT: ${{needs.job1.outputs.starts_commit_sha}}
+            END_COMMIT: ${{needs.job1.outputs.end_commit_sha}}
+            FILES: ${{needs.job1.outputs.changed_files}}
+          run: |
+            echo '${{ toJSON(needs.job1.outputs) }}'
+            echo " start = $START_COMMIT"
+            echo " end = $END_COMMIT"
+            echo " files = $FILES"
+
+        - name: Get changed files
+          id: changedFiles
+          env:
+            FILE_LIST: ${{needs.job1.outputs.changed_files}}
+          run: |
+            
+            echo "----------"
+
+
+            git --version
+
+            echo "$FILE_LIST"
+
+            # readarray -t file_list_array < <(echo '$JSON_FILE_LIST' | jq -r '.[]')
+            IFS=, read -ra file_list_array <<< "${{ needs.job1.outputs.changed_files }}"
+            
+            # An array to store the unique two-component paths
+            declare -a component_list
+            
+            # Use a temporary associative array to handle uniqueness easily
+            declare -A unique_components
+            
+            for file_path in "${file_list_array[@]}"; do
+                # Check if the path starts with "apps/" or "packages/"
+                if [[ "$file_path" =~ ^(apps|packages)/ ]]; then
+                    # Use IFS to split the path into an array of components
+                    IFS='/' read -ra path_parts <<< "$file_path"
+                    
+                    # Check if the path has at least two components after splitting
+                    if [[ "${#path_parts[@]}" -gt 1 ]]; then
+                        # Construct the two-component path
+                        two_component_path="${path_parts[0]}/${path_parts[1]}"
+                        
+                        # Check if this component path has already been added to the unique_components array
+                        # If not, add it. This automatically handles duplicates.
+                        if [[ ! -v unique_components["$two_component_path"] ]]; then
+                            unique_components["$two_component_path"]=1
+                            component_list+=("$two_component_path")
+                        fi
+                    fi
+                fi
+            done
+
+            echo "****"
+            
+            # Print the resulting list
+            echo "Extracted components:"
+            for component in "${component_list[@]}"; do
+                echo "- $component"
+            done
