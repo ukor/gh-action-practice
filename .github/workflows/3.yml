@@ -60,7 +60,10 @@ jobs:
           echo "start SHA = $start_commit" " end SHA = $end_commit"
 
           readarray -t file_list < <(git --no-pager diff --name-only "$start_commit" "$end_commit")
-          json_array=$(printf '%s\n' "${file_list[@]}" | jq -R . | jq -s .)
+          # json_array=$(printf '%s\n' "${file_list[@]}" | jq -R . | jq -s .)
+          
+          IFS=,
+          list_string="${file_list[*]}"
 
           echo "--- file list start --"
 
@@ -88,7 +91,7 @@ jobs:
         - name: Get changed files
           id: changedFiles
           env:
-            JSON_FILE_LIST: ${{needs.job1.outputs.changed_files}}
+            FILE_LIST: ${{needs.job1.outputs.changed_files}}
           run: |
             
             echo "----------"
@@ -96,9 +99,10 @@ jobs:
 
             git --version
 
-            echo "$JSON_FILE_LIST"
+            echo "$_FILE_LIST"
 
-            readarray -t file_list_array < <(echo '$JSON_FILE_LIST' | jq -r '.[]')
+            # readarray -t file_list_array < <(echo '$JSON_FILE_LIST' | jq -r '.[]')
+            IFS=, read -ra file_list_array <<< "${{ needs.job1.outputs.changed_files }}"
             
             # An array to store the unique two-component paths
             declare -a component_list
