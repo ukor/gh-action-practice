@@ -78,17 +78,14 @@ jobs:
           env:
             START_COMMIT: ${{needs.job1.outputs.starts_commit_sha}}
             END_COMMIT: ${{needs.job1.outputs.end_commit_sha}}
-            FILES: ${{needs.job1.outputs.changed_files}}
           run: |
             echo '${{ toJSON(needs.job1.outputs) }}'
             echo " start = $START_COMMIT"
             echo " end = $END_COMMIT"
-            echo " files = $FILES"
+            echo " files = ${{needs.job1.outputs.changed_files}}"
 
         - name: Get changed files
           id: changedFiles
-          env:
-            JSON_FILE_LIST: ${{needs.job1.outputs.changed_files}}
           run: |
             
             echo "----------"
@@ -98,7 +95,7 @@ jobs:
 
             echo "$JSON_FILE_LIST"
 
-            readarray -t file_list_array < <(echo '$JSON_FILE_LIST' | jq -r '.[]')
+            readarray -t file_list_array < <(echo '${{ needs.job1.outputs.changed_files }}' | jq -r '.[]')
             
             # An array to store the unique two-component paths
             declare -a component_list
