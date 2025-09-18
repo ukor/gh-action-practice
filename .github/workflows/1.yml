@@ -17,6 +17,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+        with: 
+          fetch-depth: 0
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
@@ -54,7 +56,7 @@ jobs:
 
           echo "$start_commit" "$end_commit"
 
-          git --no-pager diff --name-only FETCH_HEAD $(git merge-base FETCH_HEAD master)
+          git --no-pager diff --name-only FETCH_HEAD $(git merge-base FETCH_HEAD main)
 
           git --version
           
