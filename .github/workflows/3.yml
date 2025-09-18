@@ -73,7 +73,7 @@ jobs:
 
           echo "--- file list end --"
 
-          # echo "changed_files=$list_string" >> "$GITHUB_OUTPUT"
+          echo "changed_files=$list_string" >> "$GITHUB_OUTPUT"
           # printf "changed_files=%s\n" "$json_array" >> $GITHUB_OUTPUT
           
   job2:
