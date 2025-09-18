@@ -76,24 +76,24 @@ jobs:
           declare -A unique_components
           
           for file_path in "${file_list[@]}"; do
-          # Check if the path starts with "apps/" or "packages/"
-          if [[ "$file_path" =~ ^(apps|packages)/ ]]; then
-              # Use IFS to split the path into an array of components
-              IFS='/' read -ra path_parts <<< "$file_path"
-              
-              # Check if the path has at least two components after splitting
-              if [[ "${#path_parts[@]}" -gt 1 ]]; then
-                  # Construct the two-component path
-                  two_component_path="${path_parts[0]}/${path_parts[1]}"
-                  
-                  # Check if this component path has already been added to the unique_components array
-                  # If not, add it. This automatically handles duplicates.
-                  if [[ ! -v unique_components["$two_component_path"] ]]; then
-                      unique_components["$two_component_path"]=1
-                      component_list+=("$two_component_path")
-                  fi
-              fi
-          fi
+            # Check if the path starts with "apps/" or "packages/"
+            if [[ "$file_path" =~ ^(apps|packages)/ ]]; then
+                # Use IFS to split the path into an array of components
+                IFS='/' read -ra path_parts <<< "$file_path"
+                
+                # Check if the path has at least two components after splitting
+                if [[ "${#path_parts[@]}" -gt 1 ]]; then
+                    # Construct the two-component path
+                    two_component_path="${path_parts[0]}/${path_parts[1]}"
+                    
+                    # Check if this component path has already been added to the unique_components array
+                    # If not, add it. This automatically handles duplicates.
+                    if [[ ! -v unique_components["${path_parts[1]}"] ]]; then
+                        unique_components["${path_parts[1]}"]=1
+                        component_list+=("$two_component_path")
+                    fi
+                fi
+            fi
           done
           
           # Print the resulting list
