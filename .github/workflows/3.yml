@@ -79,7 +79,7 @@ jobs:
             START_COMMIT: ${{needs.job1.outputs.starts_commit_sha}}
             END_COMMIT: ${{needs.job1.outputs.end_commit_sha}}
           run: |
-            echo '${{ toJSON(needs.job1.outputs) }}'
+            
             echo " start = $START_COMMIT"
             echo " end = $END_COMMIT"
             echo " files = ${{needs.job1.outputs.changed_files}}"
