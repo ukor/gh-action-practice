@@ -63,6 +63,12 @@ jobs:
 
           echo "changed_files=$file_list" >> "$GITHUB_OUTPUT"
           
+          echo "--- file list start --"
+
+          echo "$file_list"
+
+          echo "--- file list end --"
+          
   job2:
     runs-on: ubuntu-latest
     needs: [job1]
