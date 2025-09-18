@@ -80,6 +80,8 @@ jobs:
             if [[ "$file_path" =~ ^(apps|packages)/ ]]; then
                 # Use IFS to split the path into an array of components
                 IFS='/' read -ra path_parts <<< "$file_path"
+
+                echo "$path_parts"
                 
                 # Check if the path has at least two components after splitting
                 if [[ "${#path_parts[@]}" -gt 1 ]]; then
