@@ -32,6 +32,8 @@ jobs:
           echo Add other actions to build,
           echo "$GITHUB_CONTEXT"
           echo "$GITHUB_WORKSPACE"
+
+          git --no-pager log --one-liner
           
 
           # Exit immediately if a command exits with a non-zero status.
