@@ -86,18 +86,11 @@ jobs:
             if [[ "$file_path" =~ ^(apps|packages)/ ]]; then
                 # Use IFS to split the path into an array of components
                 IFS='/' read -ra path_parts <<< "$file_path"
-
-                echo "**path_parts**"
-                echo "$path_parts"
-                echo "**path_parts**"
                 
                 # Check if the path has at least two components after splitting
                 if [[ "${#path_parts[@]}" -gt 1 ]]; then
                     # Construct the two-component path
                     two_component_path="${path_parts[0]}/${path_parts[1]}"
-                    echo "**got here for**"
-                    echo "$path_parts and $two_component_path"
-                    echo "**here end**"
                     
                     # Check if this component path has already been added to the unique_components array
                     # If not, add it. This automatically handles duplicates.
