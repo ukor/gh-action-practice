@@ -75,9 +75,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: [job1]
     steps:
-    # Will show
-    # {
-    #     "starts_commit_sha": "6838b27",
-    #     "end_commit_sha": "ae79487"
-    # }
-    - run: echo '${{ toJSON(needs.job1.outputs) }}'
+        - name: log output
+            # Will show
+            # {
+            #     "starts_commit_sha": "6838b27",
+            #     "end_commit_sha": "ae79487"
+            # }
+          run: echo '${{ toJSON(needs.job1.outputs) }}'
+  job3:
+    runs-on: ubuntu-latest
+    needs: [job1]
+    steps:
+        - name: log output
+          env:
+            START_COMMIT: ${{needs.job1.outputs.starts_commit_sha}}
+            END_COMMIT: ${{needs.job1.outputs.end_commit_sha}}
+          run: |
+            echo '${{ toJSON(needs.job1.outputs) }}'
+            echo " start = $START_COMMIT"
+            echo " end = $END_COMMIT"
