@@ -1,3 +1,3 @@
 console.log("types")
 
-console.log("types 5")
+console.log("types 6")
