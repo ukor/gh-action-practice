@@ -89,7 +89,6 @@ jobs:
           id: changedFiles
           env:
             JSON_FILE_LIST: ${{needs.job1.outputs.changed_files}}
-            FILES: ${{ fromJSON(needs.job1.outputs.changed_files) }}
           run: |
             
             echo "----------"
