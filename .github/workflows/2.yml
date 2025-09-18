@@ -12,11 +12,12 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
+  job1:
     runs-on: ubuntu-latest
     outputs:
-      commitSHAs: ${{ steps.getSHAs.outputs.commitSHAs }}
-      output2: ${{ steps.step2.outputs.test }}
+      commitSHAs: ${{ steps.getCommitSHAs.outputs.commitSHAs }}
+      starts_commit_sha: ${{ steps.getCommitSHAs.outputs.start_commit }}
+      end_commit_sha: ${{ steps.getCommitSHAs.outputs.end_commit }}
     steps:
       - uses: actions/checkout@v4
         with: 
@@ -30,8 +31,8 @@ jobs:
           echo "$GITHUB_CONTEXT"
           echo "$GITHUB_WORKSPACE"
 
-      - name: Get Commit SHA
-        id: getSHAs
+      - id: getCommitSHAs
+        name: Get Commit SHA 
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           BEFORE_PR_SHA: ${{ github.event.before }}
@@ -59,15 +60,19 @@ jobs:
           start_commit=$(git rev-parse --short "$BEFORE_PR_SHA")
           end_commit=$(git rev-parse --short "$AFTER_PR_SHA")
 
+          echo "start_commit=$start_commit" >> "$GITHUB_OUTPUT"
+          echo "end_commit=$end_commit" >> "$GITHUB_OUTPUT"
+
           echo "start SHA = $start_commit" " end SHA = $end_commit"
 
           commitSHa["start"]="$start_commit"
           commitSHa["end"]="$end_commit"
 
           echo "commitSHAs=$commitSHa" >> "$GITHUB_OUTPUT"
+          
   job2:
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [job1]
     steps:
     # Will show
     # {
@@ -75,4 +80,4 @@ jobs:
     #   "output_2": "2",
     #   "output_3": "3"
     # }
-    - run: echo '${{ toJSON(needs.build.outputs) }}'
+    - run: echo '${{ toJSON(needs.job1.outputs) }}'
