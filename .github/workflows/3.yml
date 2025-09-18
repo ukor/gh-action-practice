@@ -60,14 +60,16 @@ jobs:
           echo "start SHA = $start_commit" " end SHA = $end_commit"
 
           readarray -t file_list < <(git --no-pager diff --name-only "$start_commit" "$end_commit")
-          # json_array=$(printf '%s\n' "${file_list[@]}" | jq -R . | jq -s .)
+          json_array=$(printf '%s\n' "${file_list[@]}" | jq -R . | jq -s .)
           
           IFS=,
           list_string="${file_list[*]}"
 
           echo "--- file list start --"
-
+          
           echo "$json_array"
+
+          echo "$list_string"
 
           echo "--- file list end --"
 
