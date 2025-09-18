@@ -62,9 +62,14 @@ jobs:
           readarray -t file_list < <(git --no-pager diff --name-only "$start_commit" "$end_commit")
           json_array=$(printf '%s\n' "${file_list[@]}" | jq -R . | jq -s .)
 
-          echo "changed_files=$json_array" >> "$GITHUB_OUTPUT"
-          
-          
+          echo "--- file list start --"
+
+          echo "$json_array"
+
+          echo "--- file list end --"
+
+          # echo "changed_files=$json_array" >> "$GITHUB_OUTPUT"
+          printf "list=%s\n" "$json_array" >> $GITHUB_OUTPUT
           
   job2:
     runs-on: ubuntu-latest
@@ -75,13 +80,15 @@ jobs:
             START_COMMIT: ${{needs.job1.outputs.starts_commit_sha}}
             END_COMMIT: ${{needs.job1.outputs.end_commit_sha}}
           run: |
-            
+            echo '${{ toJSON(needs.job1.outputs) }}'
             echo " start = $START_COMMIT"
             echo " end = $END_COMMIT"
-            echo " files = ${{needs.job1.outputs.changed_files}}"
+            echo " files = $FILES"
 
         - name: Get changed files
           id: changedFiles
+          env:
+            JSON_FILE_LIST: ${{needs.job1.outputs.changed_files}}
           run: |
             
             echo "----------"
@@ -91,7 +98,7 @@ jobs:
 
             echo "$JSON_FILE_LIST"
 
-            readarray -t file_list_array < <(echo '${{ needs.job1.outputs.changed_files }}' | jq -r '.[]')
+            readarray -t file_list_array < <(echo '$JSON_FILE_LIST' | jq -r '.[]')
             
             # An array to store the unique two-component paths
             declare -a component_list
