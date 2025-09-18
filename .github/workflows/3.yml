@@ -64,11 +64,7 @@ jobs:
 
           echo "changed_files=$json_array" >> "$GITHUB_OUTPUT"
           
-          echo "--- file list start --"
-
-          echo "$json_array"
-
-          echo "--- file list end --"
+          
           
   job2:
     runs-on: ubuntu-latest
