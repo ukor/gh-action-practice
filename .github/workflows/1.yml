@@ -95,6 +95,8 @@ jobs:
                 fi
             fi
           done
+
+          echo "$unique_components"
           
           # Print the resulting list
           echo "Extracted components:"
