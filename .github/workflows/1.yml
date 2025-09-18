@@ -33,6 +33,8 @@ jobs:
           echo "$GITHUB_CONTEXT"
           echo "$GITHUB_WORKSPACE"
 
+          git log HEAD@{1} -1
+
           git --no-pager log --oneline
           
 
@@ -49,8 +51,8 @@ jobs:
           declare -A changed_files
           
           # Replace these with your actual commit SHAs
-          start_commit="$BEFORE_PR_SHA"
-          end_commit="$AFTER_PR_SHA"
+          start_commit=$(git rev-parse --short "$BEFORE_PR_SHA")
+          end_commit=$(git rev-parse --short "$AFTER_PR_SHA")
 
           echo "$start_commit" "$end_commit"
 
