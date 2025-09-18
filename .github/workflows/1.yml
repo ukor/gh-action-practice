@@ -60,8 +60,13 @@ jobs:
           git --version
           
           # Capture the output of git diff in a variable
-          file_list=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
+          files_changed=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
 
+          # Use readarray (or mapfile) to read the newline-separated string
+          # and store each line as a new element in the 'file_list_array'.
+          # The '--no-pager' flag is still crucial here.
+          readarray -t file_list < <(git --no-pager diff --name-only "$start_commit" "$end_commit")# Use readarray (or mapfile) to read the newline-separated string
+          
           echo "--- file list start --"
 
           echo "$file_list"
