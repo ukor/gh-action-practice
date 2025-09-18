@@ -1,5 +1,5 @@
 
-name: CI
+name: output (2.yml)
 
 on:
   push:

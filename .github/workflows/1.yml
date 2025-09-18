@@ -1,5 +1,5 @@
 
-name: CI
+name: first (1.yml)
 
 on:
   push:
