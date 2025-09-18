@@ -19,13 +19,8 @@ jobs:
       - uses: actions/checkout@v4
         with: 
           fetch-depth: 0
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Github context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           BEFORE_PR_SHA: ${{ github.event.before }}
@@ -38,13 +33,15 @@ jobs:
           echo "----------"
 
           # Exit immediately if a command exits with a non-zero status.
-          # set -o errexit
+          set -o errexit
           
           # Treat unset variables as an error when substituting.
           # set -o nounset
           
           # The exit status of a pipeline is the status of the last command to exit with a non-zero status.
-          # set -o pipefail
+          set -o pipefail
+
+          git --version
           
           # Declare the associative array
           declare -A changed_files
@@ -53,19 +50,15 @@ jobs:
           start_commit=$(git rev-parse --short "$BEFORE_PR_SHA")
           end_commit=$(git rev-parse --short "$AFTER_PR_SHA")
 
-          echo "$start_commit" "$end_commit"
+          echo "start SHA = $start_commit" " end SHA = $end_commit"
 
           # git --no-pager diff --name-only FETCH_HEAD $(git merge-base FETCH_HEAD main)
-
-          git --version
           
           # Capture the output of git diff in a variable
-          files_changed=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
+          # files_changed=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
 
           # Use readarray (or mapfile) to read the newline-separated string
-          # and store each line as a new element in the 'file_list_array'.
-          # The '--no-pager' flag is still crucial here.
-        
+          # and store each line as a new element in the 'file_list'.
           readarray -t file_list < <(git --no-pager diff --name-only "$start_commit" "$end_commit")
           
           echo "--- file list start --"
@@ -102,10 +95,6 @@ jobs:
             fi
           done
 
-          echo "****"
-          echo "$component_list"
-          echo "****"
-          echo "$unique_components"
           echo "****"
           
           # Print the resulting list
