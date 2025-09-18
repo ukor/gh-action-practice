@@ -62,6 +62,13 @@ jobs:
           # Capture the output of git diff in a variable
           file_list=$(git --no-pager diff --name-only "$start_commit" "$end_commit")
 
+          echo "--- file list start --"
+
+          echo "$file_list"
+
+          echo "--- file list end --"
+          
+
           # An array to store the unique two-component paths
           declare -a component_list
           
